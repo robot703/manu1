@@ -1,0 +1,40 @@
+def BMI(height, weight):
+        height = height * 0.01
+        bmi = weight / (height * height)    #bmi공식
+        print("BMI: ", '%.2f'%bmi)
+        if bmi < 18.5:
+                print("마른체형입니다.")
+                print("코디법-> 밝은 색감의 옷이나 화려한 패턴의 옷을 입으면 마른체형을 보완할수있음.")
+                print("사이즈는 정사이즈보다 한치수 크게 입는걸 추천.")
+        elif 18.5 <= bmi < 25.0:
+                print("표준체형입니다.") #날씨나 직업등으로 코디 결정
+        elif 25.0 <= bmi < 30.0:
+                print("비만체형입니다.")
+                 print("코디법-> 채도가 낮은 옷이나 패턴이 없고 포인트 한개 정도있는 옷을 추천.")
+        else:
+                print("고도비만체형입니다.")
+                print("코디법-> 어두운 색감의 옷이나 패턴이 들어가 있지않은 옷을 추천. 사이즈는 정사이즈로 입는 걸 추천.")
+
+while 1:
+        height = input("키를 입력하세요(cm): ")
+        weight = input("몸무게를 입력하세요(kg): ")
+        BMI(float(height), float(weight))
+
+def bodymenu():
+    button1 = Button(window, text="상 하체 모두 뚱뚱한 체형")
+    button2 = Button(window, text="상체 비만")
+    button3 = Button(window, text="하체 비만")
+    button4 = Button(window, text="마른 체형")
+    button5 = Button(window, text="잘 모르겠음", command=BMI)
+
+    if button1:
+        print("채도가 낮은 옷을 추천. 패턴이 없고 포인트가 한개 들어간 옷이 뚱뚱한 체형을 보완해줌.")
+        print("사이즈는 정사이즈로 입는걸 추천.")
+    elif button2:
+        print("짙은 색의 상의, 좁은 V넥을 추천")
+        print("상의는 단순 컬러로, 하의는 돋보이도록 무늬가 있거나 연한 색감의 옷을 추천.")
+    elif button3:
+        print("와이드한 하의(슬랙스), 밝은 색감의 상의로 상체가 돋보이도록함.")
+    elif button4:
+        print("밝은 색감의 옷이나 화려한 패턴의 옷을 입으면 마른체형을 보완할수있음.")
+        print("사이즈는 정사이즈보다 한치수 크게 입는걸 추천.")
