@@ -1,0 +1,65 @@
+## placemenu_school ##
+
+from bs4 import BeautifulSoup as bs
+from urllib.request import urlopen
+from urllib.parse import quote_plus
+from PIL import Image
+
+print("1. 후드티")
+print("활용성과 실용성이 매우 높은 아이템")
+print("쌀쌀한 날씨에 체온을 따뜻하게 유지하기에 좋음")
+print("다양한 코디 가능")
+
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+plusUrl = "후드티 코디"
+crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+html = urlopen(url)
+soup = bs(html, "html.parser")
+img = soup.find_all(class_='_img')
+ 
+n = 1
+for i in img:
+    print(n)
+    imgUrl = i['data-source']
+    with urlopen(imgUrl) as f:
+        with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+            img = f.read()
+            h.write(img)
+    n += 1
+    if n > crawl_num:
+        break
+    
+print('코디를 보여주겠습니다')
+im = Image.open('C:/Users/정연휘/Desktop/image/1.jpg') # 이미지 불러오기
+im.show() # 이미지 보여주기
+
+print("2. 맨투맨")
+print("여름 빼고 다양하게 이용할 수 있는 아이템")
+print("깔끔함의 정석인 코디")
+
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+plusUrl = "맨투맨 코디"
+crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+html = urlopen(url)
+soup = bs(html, "html.parser")
+img = soup.find_all(class_='_img')
+ 
+n = 1
+for i in img:
+    print(n)
+    imgUrl = i['data-source']
+    with urlopen(imgUrl) as f:
+        with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+            img = f.read()
+            h.write(img)
+    n += 1
+    if n > crawl_num:
+        break
+    
+print('코디를 보여주겠습니다')
+im = Image.open('C:/Users/정연휘/Desktop/image/1.jpg') # 이미지 불러오기
+im.show() # 이미지 보여주기
