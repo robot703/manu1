@@ -1,0 +1,66 @@
+from bs4 import BeautifulSoup as bs
+from urllib.request import urlopen
+from urllib.parse import quote_plus
+from PIL import Image
+
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+plusUrl = "마른체형 코디"
+
+url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+html = urlopen(url)
+soup = bs(html, "html.parser")
+img = soup.find_all(class_='_img')
+
+n = 1
+for i in img:
+    print(n)
+    imgUrl = i['data-source']
+    with urlopen(imgUrl) as f:
+        with open('C:/Users/사용자/happy/image_python/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+            img = f.read()
+            h.write(img)
+    n += 1
+    if n > crawl_num:
+        break
+    
+print('1.오버핏 맨투맨(밝은 색상)-왜소한 몸집을 보완')
+im = Image.open('C:/사용자/happy/image_python/마른체형1.jpg') # 이미지 불러오기
+im.show() # 이미지 보여주기
+
+print('2.어두운 계열 하의-마른 하체에 집중되지 않도록 해준다')
+im = Image.open('C:/사용자/happy/image_python/마른체형2.jpg') # 이미지 불러오기
+im.show() # 이미지 보여주기
+
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+plusUrl = "보통체형 코디"
+
+print('날씨나 장소에 따라 코디 결정')
+
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+plusUrl = "뚱뚱한체형 코디"
+
+url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+html = urlopen(url)
+soup = bs(html, "html.parser")
+img = soup.find_all(class_='_img')
+
+n = 1
+for i in img:
+    print(n)
+    imgUrl = i['data-source']
+    with urlopen(imgUrl) as f:
+        with open('C:/Users/사용자/happy/image_python/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+            img = f.read()
+            h.write(img)
+    n += 1
+    if n > crawl_num:
+        break
+    
+print('1.어두운 계열의 패턴없는 상의')
+im = Image.open('C:/사용자/happy/image_python/뚱뚱한체형1.jpg') # 이미지 불러오기
+im.show() # 이미지 보여주기
+
+print('2.어두운 계열의 슬랙스-다리를 얇아보이게 하는 효과')
+im = Image.open('C:/사용자/happy/image_python/뚱뚱한체형2.jpg') # 이미지 불러오기
+im.show() # 이미지 보여주기
+
