@@ -1,0 +1,247 @@
+from bs4 import BeautifulSoup as bs
+from pprint import pprint
+import requests
+from urllib.request import urlopen, Request
+import urllib
+import bs4
+from urllib.parse import quote_plus
+from PIL import Image
+
+html = requests.get('https://search.naver.com/search.naver?query=날씨')
+#pprint(html.text)
+
+soup = BeautifulSoup(html.text, 'html.parser')
+
+data1 = soup.find('div', {'class': 'weather_box'})
+
+find_address = data1.find('span', {'class':'btn_select'}).text
+print('현재 위치: '+find_address)
+
+find_currenttemp = data1.find('span',{'class': 'todaytemp'}).text
+print('현재 온도: '+find_currenttemp+'℃')
+
+data2 = data1.findAll('dd')
+find_dust = data2[0].find('span', {'class':'num'}).text
+find_ultra_dust = data2[1].find('span', {'class':'num'}).text
+find_ozone = data2[2].find('span', {'class':'num'}).text
+
+print('현재 미세먼지: '+find_dust)
+print('현재 초미세먼지: '+find_ultra_dust)
+print('현재 오존지수: '+find_ozone)
+print("============================================================================")
+
+if (find_currenttemp > '27') : 
+    print("나시티, 반바지, 민소매 원피스")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "나시티, 반바지 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
+    
+if (find_currenttemp > '23' and find_currenttemp < '26') : 
+    print("반팔, 얇은 셔츠, 얇은 긴팔, 반바지, 면바지")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "반팔, 얇은 셔츠 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
+    
+if (find_currenttemp > '20' and find_currenttemp < '22') : 
+    print("긴팔티, 가디건, 후드티, 면바지, 슬랙스, 스키니")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "긴팔티, 가디건 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
+    
+if (find_currenttemp > '17' and find_currenttemp < '19') : 
+    print("니트, 가디건, 후드티, 맨투맨, 청바지, 면바지, 슬랙스, 원피스")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "니트, 후드티 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
+    
+if (find_currenttemp > '12' and find_currenttemp < '16') : 
+    print("자켓, 셔츠, 가디건, 간절기 야상, 살색 스타킹")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "자켓, 셔츠 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
+    
+if (find_currenttemp > '10' and find_currenttemp < '11') : 
+    print("트렌치코트, 간절기 야상, 여러겹 껴입기")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "트렌치코트 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
+    
+if (find_currenttemp > '6' and find_currenttemp < '9') : 
+    print("코트, 가죽자켓")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "가죽자켓 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
+    
+if (find_currenttemp > '5') :
+    print("야상, 패딩, 목도리, 겨울 옷")
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "패딩 코디"
+    crawl_num = int(input('보고 싶은 코디 갯수 입력(최대 50개): '))
+ 
+    url = baseUrl + quote_plus(plusUrl) # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+ 
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/정연휘/Desktop/image/' + str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+    
+    print('코디를 보여주겠습니다')
+    im = Image.open('C:/Users/정연휘/Desktop/image/' + str(i)+'.jpg') # 이미지 불러오기
+    im.show() # 이미지 보여주기
