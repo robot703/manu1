@@ -1,0 +1,168 @@
+from tkinter import *
+from tkinter.simpledialog import *
+from bs4 import BeautifulSoup
+from pprint import pprint
+import requests
+from urllib.request import urlopen, Request
+import urllib
+import bs4
+from urllib.parse import quote_plus
+from PIL import Image
+
+
+def slimbody():
+    from bs4 import BeautifulSoup as bs
+    from urllib.request import urlopen
+    from urllib.parse import quote_plus
+    from PIL import Image
+
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "마른체형 코디"
+    crawl_num = askinteger("보고 싶은 코디 갯수", "보고 싶은 코디 갯수를 입력하세요 (1~50)" ,minvalue = 1, maxvalue = 50)
+
+    url = baseUrl + quote_plus(plusUrl)  # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/happy/Desktop/image/' + str(n) + '.jpg', 'wb') as h:  # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+
+    print('코디를 보여주겠습니다')
+
+    im = Image.open('C:/Users/happy/Desktop/image/1.jpg')  # 이미지 불러오기
+    im.show()  # 이미지 보여주기
+
+    slimtext=Label(window, text='코디법 : 밝은 색감의 옷이나 화려한 패턴의 옷을 입으면 마른체형을 보완할수있음.'
+                                '\n사이즈는 정사이즈보다 한치수 크게 입는걸 추천.')
+    slimtext.pack(padx=10, pady=10)
+
+def normalbody():
+    from bs4 import BeautifulSoup as bs
+    from urllib.request import urlopen
+    from urllib.parse import quote_plus
+    from PIL import Image
+
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "보통체형 코디"
+    crawl_num = askinteger("보고 싶은 코디 갯수", "보고 싶은 코디 갯수를 입력하세요 (1~50)" ,minvalue = 1, maxvalue = 50)
+
+    url = baseUrl + quote_plus(plusUrl)  # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/happy/Desktop/image/' + str(n) + '.jpg', 'wb') as h:  # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+
+    print('코디를 보여주겠습니다')
+
+    im = Image.open('C:/Users/happy/Desktop/image/1.jpg')  # 이미지 불러오기
+    im.show()  # 이미지 보여주기
+    normaltext=Label(window, text='날씨나 장소에 따라 코디결정')
+    normaltext.pack(padx=10, pady=10)
+
+def fatbody():
+    from bs4 import BeautifulSoup as bs
+    from urllib.request import urlopen
+    from urllib.parse import quote_plus
+    from PIL import Image
+
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+    plusUrl = "뚱뚱한체형 코디"
+    crawl_num = askinteger("보고 싶은 코디 갯수", "보고 싶은 코디 갯수를 입력하세요 (1~50)" ,minvalue = 1, maxvalue = 50)
+
+    url = baseUrl + quote_plus(plusUrl)  # 한글 검색 자동 변환
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+
+    n = 1
+    for i in img:
+        print(n)
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open('C:/Users/happy/Desktop/image/' + str(n) + '.jpg', 'wb') as h:  # w - write b - binary
+                img = f.read()
+                h.write(img)
+        n += 1
+        if n > crawl_num:
+            break
+
+    print('코디를 보여주겠습니다')
+
+    im = Image.open('C:/Users/happy/Desktop/image/1.jpg')  # 이미지 불러오기
+    im.show()  # 이미지 보여주기
+
+    fattext=Label(window, text='코디법 : 채도가 낮은 옷이나 패턴이 없고 포인트 한개 정도있는 옷을 추천.\n'
+                               '어두운 색감의 옷이나 패턴이 들어가 있지않은 옷을 추천. 사이즈는 정사이즈로 입는 걸 추천.')
+    fattext.pack(padx=10, pady=10)
+
+def bmi():
+    l1 = Label(window, text='BMI 계산기')
+    l2 = Label(window, text='키: ')
+    l3 = Label(window, text='체중: ')
+    l5 = Label(window, text='m')
+    l6 = Label(window, text='kg')
+    l1.place(x=5, y=10)
+    l2.place(x=20, y=50)
+    l3.place(x=20, y=80)
+    l5.place(x=230, y=50)
+    l6.place(x=230, y=80)
+
+    # 입출력 칸을 Entry로 생성, place로 위치 고정
+    e1 = Entry(window)
+    e2 = Entry(window)
+    e1.place(x=75, y=50)
+    e2.place(x=75, y=80)
+
+    # 계산하기, 다시하기 버튼 생성 및 이벤트 처리, place로 위치 고정
+    b1 = Button(window, text="계산하기")
+    b1.place(x=140, y=115)
+
+    def cal():
+        he = float(e1.get())
+        we = float(e2.get())
+        bmi = we/(he*he)        #bmi 계산
+        bmi = round(bmi, 1)     #bmi를 소수점 둘째자리에서 반올림
+        if bmi <= 18.5:
+            slimbody()
+        elif bmi < 25:
+            normalbody()
+        else:
+            fatbody()
+    b1 = Button(window, text="계산하기", command=cal)
+
+if __name__ == "__main__":
+    window = Tk()
+    window.title("WPC를 입다")
+
+    mainMenu = Menu(window)
+    window.config(menu=mainMenu)
+
+    fileMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="체형", menu=fileMenu)
+    fileMenu.add_command(label="마른 체형", command=slimbody)
+    fileMenu.add_command(label="보통 체형", command=normalbody)
+    fileMenu.add_command(label="뚱뚱한 체형", command=fatbody)
+    fileMenu.add_command(label="잘모르겠음", command=bmi)
+
+    window.mainloop()
