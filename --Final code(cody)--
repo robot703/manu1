@@ -1,0 +1,477 @@
+# -*- encoding:utf8 -*-
+
+################################################################
+
+# 내장 모듈
+try:
+    import tkinter as tk
+    from tkinter import simpledialog
+
+except Exception as err:
+    import Tkinter as tk
+
+import os
+from urllib import request, parse
+from tkinter import *
+from tkinter.simpledialog import *
+from bs4 import BeautifulSoup
+from pprint import pprint
+import requests
+from urllib.request import urlopen, Request
+import urllib
+import bs4
+from urllib.parse import quote_plus
+from PIL import Image
+from bs4 import BeautifulSoup as bs
+import os
+from tkinter import simpledialog
+from PIL import ImageTk
+
+# ------------------------------------------------
+
+# 외부 모듈
+from bs4 import BeautifulSoup as bs
+from PIL import Image, ImageTk
+
+################################################################
+
+# 상수
+CWD = os.path.dirname(os.path.abspath(''))  # Current Working Directory
+
+# ------------------------------------------------
+
+# 전역 변수
+window = None
+widgets = []
+
+
+################################################################
+
+def exit():
+    window.quit()
+    window.destroy()
+
+
+def crawl_image(searchKeyword, numberOfImages):
+    """
+    네이버로부터 이미지를 크롤링 해오는 함수.
+
+    @param searchKeyword: 네이버 검색에 사용할 검색키워드\n
+    @param numberOfImages: 크롤링 해올 이미지 개수\n
+    """
+    # 네이버로부터 검색
+    searchKeywordEncoded = parse.quote_plus(searchKeyword)  # 한글 검색 자동 변환
+    url = "https://search.naver.com/search.naver?where=image&sm=tab_jum&query=" + searchKeywordEncoded
+
+    html = request.urlopen(url)
+
+    # 이미지 찾기
+    soup = bs(html, "html.parser")
+    imageNodeList = soup.find_all(class_='_img')
+    imageUrlList = [img['data-source'] for img in imageNodeList]
+
+    # 크롤된 이미지는 ./crawled 폴더에 저장.
+    saveAt = os.path.join(CWD, 'crawled')
+
+    if not os.path.exists(saveAt): os.mkdir(saveAt)  # ./crawled 폴더가 없으면 폴더 생성
+
+    # 이미지 크롤링 시작
+    for imgIdx in range(len(imageUrlList)):
+        # (imgIdx는 0부터 시작, 지정된 갯수 만큼만 이미지 불러옴)
+        if imgIdx >= numberOfImages: break
+
+        imageUrl = imageUrlList[imgIdx]
+
+        # 이미지를 크롤링 한 후, 내 컴퓨터에 저장.
+        with request.urlopen(imageUrl) as crawledImageFile:
+            with open(os.path.join(saveAt, '%d.jpg' % imgIdx), 'wb') as imageFile:
+                image = crawledImageFile.read()
+                imageFile.write(image)
+
+
+# ------------------------------------------------
+
+def image_show(image):
+    global window
+    global widgets
+    global currentCanvas
+
+    image = image.resize((300, 400), Image.ANTIALIAS)
+
+    # 가비지 컬렉터로 인한 이미지 손실 방지
+    window.imageList.append(ImageTk.PhotoImage(image))
+
+    canvas = tk.Canvas(window, width=image.width, height=image.height)
+    canvas.create_image(image.width / 2, image.height / 2, image=window.imageList[-1])
+    canvas.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
+    widgets.append(canvas)  # 추후 삭제 용이하도록
+
+    return canvas
+
+
+# ------------------------------------------------
+
+def destroy_all_widgets():
+    """
+    화면에 보이는 모든 위젯을 삭제.\n
+    (단, `widgets.append(~~)`를 통해 추가된 것만 삭제함)
+    """
+    global window, widgets
+
+    for widget in widgets:
+        widget.pack_forget()
+
+    window.imageList = []
+    widgets = []
+
+
+# ------------------------------------------------
+
+currentImageIdx = 0
+
+
+def show_cody(crawlKeyword, description=""):
+    global window
+    global widgets
+    global currentImageIdx, canvasList
+
+    destroy_all_widgets()
+
+    crawlNum = tk.simpledialog.askinteger("보고 싶은 코디 갯수", "보고 싶은 코디 갯수를 입력하세요 (1~50)", minvalue=1, maxvalue=50)
+    crawl_image(crawlKeyword, crawlNum)
+
+    labelPrimary = tk.Label(window, text=description)
+    labelPrimary.pack(padx=5, pady=5)
+    widgets.append(labelPrimary)  # 추후 삭제 용이하도록
+
+    labelSecondary_strVar = tk.StringVar()
+    labelSecondary_strVar.set("코디를 보여주겠습니다")
+
+    labelSecondary = tk.Label(window, textvariable=labelSecondary_strVar)
+    labelSecondary.pack(padx=5, pady=5)
+    widgets.append(labelSecondary)  # 추후 삭제 용이하도록
+
+    canvasList = []
+
+    def update(targetIdx):
+        global currentImageIdx, canvasList
+        for idx in range(len(canvasList)):
+            if idx == targetIdx:
+                canvasList[idx].pack(padx=650, pady=100)
+            else:
+                canvasList[idx].pack_forget()
+
+        labelSecondary_strVar.set("코디를 보여주겠습니다. (%d/%d)" % (currentImageIdx + 1, crawlNum))
+
+    def next():
+        global currentImageIdx
+        if currentImageIdx < crawlNum - 1:
+            currentImageIdx += 1
+        update(currentImageIdx)
+
+    def prev():
+        global currentImageIdx
+        if currentImageIdx > 0:
+            currentImageIdx -= 1
+        update(currentImageIdx)
+
+    buttonNext = tk.Button(window, text="다음", command=next)
+    buttonNext.pack(padx=5, pady=5)
+    widgets.append(buttonNext)  # 추후 삭제 용이하도록
+
+    buttonPrev = tk.Button(window, text="이전", command=prev)
+    buttonPrev.pack(padx=5, pady=5)
+    widgets.append(buttonPrev)  # 추후 삭제 용이하도록
+
+    currentImageIdx = 0
+    for imgIdx in range(crawlNum):
+        imageFile = Image.open(os.path.join(CWD, 'crawled/%d.jpg' % imgIdx))
+
+        canvas = image_show(imageFile)
+        canvasList.append(canvas)
+
+    update(currentImageIdx)
+
+
+# ------------------------------------------------
+
+def present():
+    destroy_all_widgets()
+    html = requests.get('https://search.naver.com/search.naver?query=날씨')
+    # pprint(html.text)
+
+    soup = BeautifulSoup(html.text, 'html.parser')
+
+    data1 = soup.find('div', {'class': 'weather_box'})
+
+    find_address = data1.find('span', {'class': 'btn_select'}).text
+    labelText1 = Label(window, text='현재 위치: ' + find_address)
+    labelText1.pack(padx=5, pady=5)
+
+    find_currenttemp = soup.find('span', {'class': 'todaytemp'}).text + soup.find('span', {'class': 'tempmark'}).text[
+                                                                        2:]
+
+    labelText2 = Label(window, text='현재 온도: ' + find_currenttemp + '℃')
+    labelText2.pack(padx=5, pady=5)
+
+    WeatherCast = soup.find('p', {'class': 'cast_txt'}).text
+    labelText8 = Label(window, text='현재 상태 : ' + WeatherCast)
+    labelText8.pack(padx=5, pady=5)
+    label20 = Label(window, text='확인')
+
+    data2 = data1.findAll('dd')
+    find_dust = data2[0].find('span', {'class': 'num'}).text
+    find_ultra_dust = data2[1].find('span', {'class': 'num'}).text
+    find_ozone = data2[2].find('span', {'class': 'num'}).text
+
+    labelText3 = Label(window, text='현재 미세먼지: ' + find_dust)
+    labelText3.pack(padx=5, pady=5)
+
+    labelText4 = Label(window, text='현재 초미세먼지: ' + find_ultra_dust)
+    labelText4.pack(padx=5, pady=5)
+
+    labelText5 = Label(window, text='현재 오존지수: ' + find_ozone)
+    labelText5.pack(padx=5, pady=5)
+
+    labelText6 = Label(window, text="============================================================================")
+    labelText6.pack(padx=5, pady=5)
+
+    if (find_currenttemp > '27'):
+        show_cody("나시티, 반바지, 민소매 원피스", description="나시티, 반바지, 민소매 원피스를 입으세요\n")
+
+    if (find_currenttemp > '23' and find_currenttemp < '26'):
+        show_cody("반팔, 얇은 셔츠, 얇은 긴팔, 반바지, 면바지", description="반팔, 얇은 셔츠, 얇은 긴팔, 반바지, 면바지를 입으세요\n")
+
+    if (find_currenttemp > '20' and find_currenttemp < '22'):
+        show_cody("긴팔티, 가디건, 후드티, 면바지, 슬랙스, 스키니", description="긴팔티, 가디건, 후드티, 면바지, 슬랙스, 스키니를 입으세요\n")
+
+    if (find_currenttemp > '17' and find_currenttemp < '19'):
+        show_cody("니트, 가디건, 후드티, 맨투맨, 청바지, 면바지, 슬랙스, 원피스", description="니트, 가디건, 후드티, 맨투맨, 청바지, 면바지, 슬랙스, 원피스를 입으세요\n")
+
+    if (find_currenttemp > '12' and find_currenttemp < '16'):
+        show_cody("자켓, 셔츠, 가디건, 간절기 야상, 살색 스타킹", description="자켓, 셔츠, 가디건, 간절기 야상, 살색 스타킹를 입으세요\n")
+
+    if (find_currenttemp > '10' and find_currenttemp < '11'):
+        show_cody("트렌치코트, 간절기 야상, 여러겹 껴입기", description="트렌치코트, 간절기 야상, 여러겹 껴입기를 하세요")
+
+    if (find_currenttemp > '6' and find_currenttemp < '9'):
+        show_cody("코트, 가죽자켓", description="코트, 가죽자켓을 입으세요")
+
+    if (find_currenttemp > '5'):
+        show_cody("야상, 패딩, 목도리, 겨울 옷", description="야상, 패딩, 목도리, 겨울 옷을 입으세요")
+
+    widgets.append(labelText1)
+    widgets.append(labelText2)
+    widgets.append(labelText3)
+    widgets.append(labelText4)
+    widgets.append(labelText5)
+    widgets.append(labelText6)
+    widgets.append(labelText8)
+
+
+def want():
+    destroy_all_widgets()
+    location = askstring(title="'원하는 지역'", prompt="'지역'")
+    Finallocation = location + '날씨'
+    LocationInfo = ""
+    NowTemp = ""
+    CheckDust = []
+
+    url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=' + Finallocation
+    hdr = {'User-Agent': (
+        'mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/78.0.3904.70 safari/537.36')}
+    req = requests.get(url, headers=hdr)
+    html = req.text
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # 오류 체크
+    ErrorCheck = soup.find('span', {'class': 'btn_select'})
+    if 'None' in str(ErrorCheck):
+        ("Error! 지역 검색 오류!")
+    else:
+        # 지역 정보
+        for i in soup.select('span[class=btn_select]'):
+            LocationInfo = i.text
+
+        # 현재 온도
+        NowTemp = soup.find('span', {'class': 'todaytemp'}).text + soup.find('span', {'class': 'tempmark'}).text[2:]
+
+        # 날씨 캐스트
+        WeatherCast = soup.find('p', {'class': 'cast_txt'}).text
+
+        # 오늘 오전온도, 오후온도, 체감온도
+        TodayMorningTemp = soup.find('span', {'class': 'min'}).text
+        TodayAfternoonTemp = soup.find('span', {'class': 'max'}).text
+        TodayFeelTemp = soup.find('span', {'class': 'sensible'}).text[5:]
+
+        # 자외선 지수
+        TodayUV = soup.find('span', {'class': 'indicator'}).text[4:-2] + " " + soup.find('span',
+                                                                                         {'class': 'indicator'}).text[
+                                                                               -2:]
+
+    labelA = Label(window, text="=========================================")
+    labelB = Label(window, text=LocationInfo + " 날씨 정보입니다.")
+    labelC = Label(window, text="=========================================")
+    labelD = Label(window, text="현재온도: " + NowTemp)
+    labelE = Label(window, text="체감온도: " + TodayFeelTemp)
+    labelF = Label(window, text="오전/오후 온도: " + TodayMorningTemp + "/" + TodayAfternoonTemp)
+    labelG = Label(window, text="현재 상태: " + WeatherCast)
+    # abelH = Label(window, text="현재 자외선 지수: " + TodayUV)
+    labelA.pack(padx=5, pady=5)
+    labelB.pack(padx=5, pady=5)
+    labelC.pack(padx=5, pady=5)
+    labelD.pack(padx=5, pady=5)
+    labelE.pack(padx=5, pady=5)
+    labelF.pack(padx=5, pady=5)
+    labelG.pack(padx=5, pady=5)
+    # abelH.pack(padx=5, pady=5)
+
+    if (NowTemp > '27'):
+        show_cody("나시티, 반바지, 민소매 원피스", description="나시티, 반바지, 민소매 원피스를 입으세요\n")
+
+    if (NowTemp > '23' and NowTemp < '26'):
+        show_cody("반팔, 얇은 셔츠, 얇은 긴팔, 반바지, 면바지", description="반팔, 얇은 셔츠, 얇은 긴팔, 반바지, 면바지를 입으세요\n")
+
+    if (NowTemp > '20' and NowTemp < '22'):
+        show_cody("긴팔티, 가디건, 후드티, 면바지, 슬랙스, 스키니", description="긴팔티, 가디건, 후드티, 면바지, 슬랙스, 스키니를 입으세요\n")
+
+    if (NowTemp > '17' and NowTemp < '19'):
+        show_cody("니트, 가디건, 후드티, 맨투맨, 청바지, 면바지, 슬랙스, 원피스", description="니트, 가디건, 후드티, 맨투맨, 청바지, 면바지, 슬랙스, 원피스를 입으세요\n")
+
+    if (NowTemp > '12' and NowTemp < '16'):
+        show_cody("자켓, 셔츠, 가디건, 간절기 야상, 살색 스타킹", description="자켓, 셔츠, 가디건, 간절기 야상, 살색 스타킹를 입으세요\n")
+
+    if (NowTemp > '10' and NowTemp < '11'):
+        show_cody("트렌치코트, 간절기 야상, 여러겹 껴입기", description="트렌치코트, 간절기 야상, 여러겹 껴입기를 하세요")
+
+    if (NowTemp > '6' and NowTemp < '9'):
+        show_cody("코트, 가죽자켓", description="코트, 가죽자켓을 입으세요")
+
+    if (NowTemp > '5'):
+        show_cody("야상, 패딩, 목도리, 겨울 옷", description="야상, 패딩, 목도리, 겨울 옷을 입으세요")
+
+    widgets.append(labelA)
+    widgets.append(labelB)
+    widgets.append(labelC)
+    widgets.append(labelD)
+    widgets.append(labelE)
+    widgets.append(labelF)
+    widgets.append(labelG)
+
+
+#################################################################################################
+
+def office():
+    show_cody("오피스코디", description=
+    "1. 오피스 니트\n" +
+    "활용성과 실용성이 매우 높은 아이템\n" +
+    "댄디한 분위기를 연출 가능한 깔끔한 코디 가능\n" +
+    "캐주얼한 체크셔츠와 매칭 가능\n"
+    "2. 가디건"
+    "\n여름 빼고 다양하게 이용할 수 있는 아이템"
+    "\n봄/가을엔 아우터로 가능"
+    "\n가을/겨울엔 실내에서 걸칠 수 있음")
+
+
+def school():
+    show_cody("학교 코디", description=
+    "1. 후드티"
+    "\n활용성과 실용성이 매우 높은 아이템"
+    "\n쌀쌀한 날씨에 체온을 따뜻하게 유지하기에 좋음"
+    "\n다양한 코디 가능\n"
+    "2. 맨투맨"
+    "\n여름 빼고 다양하게 이용할 수 있는 아이템"
+    "\n깔끔함의 정석인 코디"
+    "\n다양한 코디 가능")
+
+
+def wedding():
+    show_cody("결혼식 코디", description=
+    "단색으로 이루어진 깔끔한 코디")
+
+
+def placewant():
+    placewant = askstring(title="'원하는 장소 코디'", prompt="'장소를 입력하세요'")
+    show_cody(placewant, description="원하는 장소에 따른 코디입니다")
+
+
+########################################################################################
+
+def slimbody():
+    show_cody("마른체형 코디", description='*마른 체형 코디*\n'
+                                     + '1.딱 달라붙지 않는 정사이즈보다 한치수 큰 상하의\n'
+                                     + '2. 밝은 색감의 옷과 화려한 패턴으로 왜소한 체형을 보완\n')
+
+
+def normalbody():
+    show_cody("보통 체형 코디", description='*보통 체형 코디*\n'
+                                     + '1.슬랙스코디\n'
+                                     + '다리라인을 잡아주는 아이템\n'
+                                     + '여름이나 겨울 언제든 매치가능\n'
+                                     + '2.코트\n'
+                                     + '가을, 겨울에 부해보이지도 않고 왜소해보이지도 않도록 매치\n')
+
+
+def fatbody():
+    show_cody("뚱뚱한 체형 코디", description='*뚱뚱한 체형*\n'
+                                       + '코디1.정장스타일로 몸매라인을 잡아주는 아이템\n'
+                                       + '2.어두운 색감의 옷이나 패턴이 들어가 있지않은 옷\n'
+                                       + '3.사이즈는 정사이즈로 입는 걸 추천\n')
+
+
+def bmi():
+    he = askfloat(title="'BMI계산기'", prompt="'키를 입력하세요(m)'")
+    we = askfloat(title="'BMI계산기'", prompt="'몸무게를 입력하세요(kg)'")
+    bmi = we / (he * he)
+    bmi = round(bmi, 1)
+
+    if bmi <= 18.5:
+        slimbody()
+    elif bmi < 25:
+        normalbody()
+    else:
+        fatbody()
+
+
+# ------------------------------------------------
+
+if __name__ == "__main__":
+    window = Tk()
+    window.title("WPBC를 입다")
+    window.geometry("1120x734")
+
+    image = tkinter.PhotoImage(file="C:/Users/robot/OneDrive/바탕 화면/wear.png/")
+    
+    label = tkinter.Label(window, image=image)
+    label.pack()
+    widgets.append(label)
+
+    mainMenu = Menu(window)
+    window.config(menu=mainMenu)
+
+    fileMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="종료", menu=fileMenu)
+    fileMenu.add_command(label="종료하기", command=exit)
+    fileMenu.add_command(label="화면 초기화", command=destroy_all_widgets)
+
+    wethearMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="날씨", menu=wethearMenu)
+    wethearMenu.add_command(label="현재 지역 날씨", command=present)
+    wethearMenu.add_command(label="원하는 위치 날씨", command=want)
+
+    officeMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="장소", menu=officeMenu)
+    officeMenu.add_command(label="office", command=office)
+    officeMenu.add_command(label="school", command=school)
+    officeMenu.add_command(label="wedding", command=wedding)
+    officeMenu.add_command(label="원하는 장소", command=placewant)
+
+    bodyMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="체형", menu=bodyMenu)
+    bodyMenu.add_command(label="마른 체형", command=slimbody)
+    bodyMenu.add_command(label="보통 체형", command=normalbody)
+    bodyMenu.add_command(label="뚱뚱한 체형", command=fatbody)
+    bodyMenu.add_command(label="BMI계산기", command=bmi)
+
+    window.mainloop()
+    window.config(menu=mainMenu)
