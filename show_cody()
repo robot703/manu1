@@ -1,0 +1,64 @@
+currentImageIdx = 0
+
+
+def show_cody(crawlKeyword, description=""):
+    global window
+    global widgets
+    global currentImageIdx, canvasList
+
+    destroy_all_widgets()
+
+    crawlNum = tk.simpledialog.askinteger("보고 싶은 코디 갯수", "보고 싶은 코디 갯수를 입력하세요 (1~50)", minvalue=1, maxvalue=50)
+    crawl_image(crawlKeyword, crawlNum)
+
+    labelPrimary = tk.Label(window, text=description)
+    labelPrimary.pack(padx=5, pady=5)
+    widgets.append(labelPrimary)  # 추후 삭제 용이하도록
+
+    labelSecondary_strVar = tk.StringVar()
+    labelSecondary_strVar.set("코디를 보여주겠습니다")
+
+    labelSecondary = tk.Label(window, textvariable=labelSecondary_strVar)
+    labelSecondary.pack(padx=5, pady=5)
+    widgets.append(labelSecondary)  # 추후 삭제 용이하도록
+
+    canvasList = []
+
+    def update(targetIdx):
+        global currentImageIdx, canvasList
+        for idx in range(len(canvasList)):
+            if idx == targetIdx:
+                canvasList[idx].pack(padx=650, pady=100)
+            else:
+                canvasList[idx].pack_forget()
+
+        labelSecondary_strVar.set("코디를 보여주겠습니다. (%d/%d)" % (currentImageIdx + 1, crawlNum))
+
+    def next():
+        global currentImageIdx
+        if currentImageIdx < crawlNum - 1:
+            currentImageIdx += 1
+        update(currentImageIdx)
+
+    def prev():
+        global currentImageIdx
+        if currentImageIdx > 0:
+            currentImageIdx -= 1
+        update(currentImageIdx)
+
+    buttonNext = tk.Button(window, text="다음", command=next)
+    buttonNext.pack(padx=5, pady=5)
+    widgets.append(buttonNext)  # 추후 삭제 용이하도록
+
+    buttonPrev = tk.Button(window, text="이전", command=prev)
+    buttonPrev.pack(padx=5, pady=5)
+    widgets.append(buttonPrev)  # 추후 삭제 용이하도록
+
+    currentImageIdx = 0
+    for imgIdx in range(crawlNum):
+        imageFile = Image.open(os.path.join(CWD, 'crawled/%d.jpg' % imgIdx))
+
+        canvas = image_show(imageFile)
+        canvasList.append(canvas)
+
+    update(currentImageIdx)
