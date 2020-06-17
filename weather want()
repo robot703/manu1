@@ -1,0 +1,88 @@
+def want():
+    destroy_all_widgets()
+    location = askstring(title="'원하는 지역'", prompt="'지역'")
+    Finallocation = location + '날씨'
+    LocationInfo = ""
+    NowTemp = ""
+    CheckDust = []
+
+    url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=' + Finallocation
+    hdr = {'User-Agent': (
+        'mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/78.0.3904.70 safari/537.36')}
+    req = requests.get(url, headers=hdr)
+    html = req.text
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # 오류 체크
+    ErrorCheck = soup.find('span', {'class': 'btn_select'})
+    if 'None' in str(ErrorCheck):
+        ("Error! 지역 검색 오류!")
+    else:
+        # 지역 정보
+        for i in soup.select('span[class=btn_select]'):
+            LocationInfo = i.text
+
+        # 현재 온도
+        NowTemp = soup.find('span', {'class': 'todaytemp'}).text + soup.find('span', {'class': 'tempmark'}).text[2:]
+
+        # 날씨 캐스트
+        WeatherCast = soup.find('p', {'class': 'cast_txt'}).text
+
+        # 오늘 오전온도, 오후온도, 체감온도
+        TodayMorningTemp = soup.find('span', {'class': 'min'}).text
+        TodayAfternoonTemp = soup.find('span', {'class': 'max'}).text
+        TodayFeelTemp = soup.find('span', {'class': 'sensible'}).text[5:]
+
+        # 자외선 지수
+        TodayUV = soup.find('span', {'class': 'indicator'}).text[4:-2] + " " + soup.find('span',
+                                                                                         {'class': 'indicator'}).text[
+                                                                               -2:]
+
+    labelA = Label(window, text="=========================================")
+    labelB = Label(window, text=LocationInfo + " 날씨 정보입니다.")
+    labelC = Label(window, text="=========================================")
+    labelD = Label(window, text="현재온도: " + NowTemp)
+    labelE = Label(window, text="체감온도: " + TodayFeelTemp)
+    labelF = Label(window, text="오전/오후 온도: " + TodayMorningTemp + "/" + TodayAfternoonTemp)
+    labelG = Label(window, text="현재 상태: " + WeatherCast)
+    # abelH = Label(window, text="현재 자외선 지수: " + TodayUV)
+    labelA.pack(padx=5, pady=5)
+    labelB.pack(padx=5, pady=5)
+    labelC.pack(padx=5, pady=5)
+    labelD.pack(padx=5, pady=5)
+    labelE.pack(padx=5, pady=5)
+    labelF.pack(padx=5, pady=5)
+    labelG.pack(padx=5, pady=5)
+    # abelH.pack(padx=5, pady=5)
+
+    if (NowTemp > '27'):
+        show_cody("나시티, 반바지, 민소매 원피스", description="나시티, 반바지, 민소매 원피스를 입으세요\n")
+
+    if (NowTemp > '23' and NowTemp < '26'):
+        show_cody("반팔, 얇은 셔츠, 얇은 긴팔, 반바지, 면바지", description="반팔, 얇은 셔츠, 얇은 긴팔, 반바지, 면바지를 입으세요\n")
+
+    if (NowTemp > '20' and NowTemp < '22'):
+        show_cody("긴팔티, 가디건, 후드티, 면바지, 슬랙스, 스키니", description="긴팔티, 가디건, 후드티, 면바지, 슬랙스, 스키니를 입으세요\n")
+
+    if (NowTemp > '17' and NowTemp < '19'):
+        show_cody("니트, 가디건, 후드티, 맨투맨, 청바지, 면바지, 슬랙스, 원피스", description="니트, 가디건, 후드티, 맨투맨, 청바지, 면바지, 슬랙스, 원피스를 입으세요\n")
+
+    if (NowTemp > '12' and NowTemp < '16'):
+        show_cody("자켓, 셔츠, 가디건, 간절기 야상, 살색 스타킹", description="자켓, 셔츠, 가디건, 간절기 야상, 살색 스타킹를 입으세요\n")
+
+    if (NowTemp > '10' and NowTemp < '11'):
+        show_cody("트렌치코트, 간절기 야상, 여러겹 껴입기", description="트렌치코트, 간절기 야상, 여러겹 껴입기를 하세요")
+
+    if (NowTemp > '6' and NowTemp < '9'):
+        show_cody("코트, 가죽자켓", description="코트, 가죽자켓을 입으세요")
+
+    if (NowTemp > '5'):
+        show_cody("야상, 패딩, 목도리, 겨울 옷", description="야상, 패딩, 목도리, 겨울 옷을 입으세요")
+
+    widgets.append(labelA)
+    widgets.append(labelB)
+    widgets.append(labelC)
+    widgets.append(labelD)
+    widgets.append(labelE)
+    widgets.append(labelF)
+    widgets.append(labelG)
