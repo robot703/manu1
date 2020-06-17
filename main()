@@ -1,0 +1,40 @@
+if __name__ == "__main__":
+    window = Tk()
+    window.title("WPBC를 입다")
+    window.geometry("1120x734")
+
+    image = tkinter.PhotoImage(file="C:/Users/robot/OneDrive/바탕 화면/wear.png/")
+
+    label = tkinter.Label(window, image=image)
+    label.pack()
+    widgets.append(label)
+
+    mainMenu = Menu(window)
+    window.config(menu=mainMenu)
+
+    fileMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="종료", menu=fileMenu)
+    fileMenu.add_command(label="종료하기", command=exit)
+    fileMenu.add_command(label="화면 초기화", command=destroy_all_widgets)
+
+    wethearMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="날씨", menu=wethearMenu)
+    wethearMenu.add_command(label="현재 지역 날씨", command=present)
+    wethearMenu.add_command(label="원하는 위치 날씨", command=want)
+
+    officeMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="장소", menu=officeMenu)
+    officeMenu.add_command(label="office", command=office)
+    officeMenu.add_command(label="school", command=school)
+    officeMenu.add_command(label="wedding", command=wedding)
+    officeMenu.add_command(label="원하는 장소", command=placewant)
+
+    bodyMenu = Menu(mainMenu)
+    mainMenu.add_cascade(label="체형", menu=bodyMenu)
+    bodyMenu.add_command(label="마른 체형", command=slimbody)
+    bodyMenu.add_command(label="보통 체형", command=normalbody)
+    bodyMenu.add_command(label="뚱뚱한 체형", command=fatbody)
+    bodyMenu.add_command(label="BMI계산기", command=bmi)
+
+    window.mainloop()
+    window.config(menu=mainMenu)
