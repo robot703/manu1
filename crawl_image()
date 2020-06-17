@@ -1,0 +1,35 @@
+def crawl_image(searchKeyword, numberOfImages):
+    """
+    네이버로부터 이미지를 크롤링 해오는 함수.
+
+    @param searchKeyword: 네이버 검색에 사용할 검색키워드\n
+    @param numberOfImages: 크롤링 해올 이미지 개수\n
+    """
+    # 네이버로부터 검색
+    searchKeywordEncoded = parse.quote_plus(searchKeyword)  # 한글 검색 자동 변환
+    url = "https://search.naver.com/search.naver?where=image&sm=tab_jum&query=" + searchKeywordEncoded
+
+    html = request.urlopen(url)
+
+    # 이미지 찾기
+    soup = bs(html, "html.parser")
+    imageNodeList = soup.find_all(class_='_img')
+    imageUrlList = [img['data-source'] for img in imageNodeList]
+
+    # 크롤된 이미지는 ./crawled 폴더에 저장.
+    saveAt = os.path.join(CWD, 'crawled')
+
+    if not os.path.exists(saveAt): os.mkdir(saveAt)  # ./crawled 폴더가 없으면 폴더 생성
+
+    # 이미지 크롤링 시작
+    for imgIdx in range(len(imageUrlList)):
+        # (imgIdx는 0부터 시작, 지정된 갯수 만큼만 이미지 불러옴)
+        if imgIdx >= numberOfImages: break
+
+        imageUrl = imageUrlList[imgIdx]
+
+        # 이미지를 크롤링 한 후, 내 컴퓨터에 저장.
+        with request.urlopen(imageUrl) as crawledImageFile:
+            with open(os.path.join(saveAt, '%d.jpg' % imgIdx), 'wb') as imageFile:
+                image = crawledImageFile.read()
+                imageFile.write(image)
