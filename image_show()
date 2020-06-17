@@ -1,0 +1,16 @@
+def image_show(image):
+    global window
+    global widgets
+    global currentCanvas
+
+    image = image.resize((300, 400), Image.ANTIALIAS)
+
+    # 가비지 컬렉터로 인한 이미지 손실 방지
+    window.imageList.append(ImageTk.PhotoImage(image))
+
+    canvas = tk.Canvas(window, width=image.width, height=image.height)
+    canvas.create_image(image.width / 2, image.height / 2, image=window.imageList[-1])
+    canvas.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
+    widgets.append(canvas)  # 추후 삭제 용이하도록
+
+    return canvas
