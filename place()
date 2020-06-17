@@ -1,0 +1,32 @@
+def office():
+    show_cody("오피스코디", description=
+    "1. 오피스 니트\n" +
+    "활용성과 실용성이 매우 높은 아이템\n" +
+    "댄디한 분위기를 연출 가능한 깔끔한 코디 가능\n" +
+    "캐주얼한 체크셔츠와 매칭 가능\n"
+    "2. 가디건"
+    "\n여름 빼고 다양하게 이용할 수 있는 아이템"
+    "\n봄/가을엔 아우터로 가능"
+    "\n가을/겨울엔 실내에서 걸칠 수 있음")
+
+
+def school():
+    show_cody("학교 코디", description=
+    "1. 후드티"
+    "\n활용성과 실용성이 매우 높은 아이템"
+    "\n쌀쌀한 날씨에 체온을 따뜻하게 유지하기에 좋음"
+    "\n다양한 코디 가능\n"
+    "2. 맨투맨"
+    "\n여름 빼고 다양하게 이용할 수 있는 아이템"
+    "\n깔끔함의 정석인 코디"
+    "\n다양한 코디 가능")
+
+
+def wedding():
+    show_cody("결혼식 코디", description=
+    "하얀 옷을 제외한 깔끔한 코디")
+
+
+def placewant():
+    placewant = askstring(title="'원하는 장소'", prompt="'장소를 입력하세요'")
+    show_cody(placewant, description="원하는 장소에 따른 코디입니다")
